@@ -1,0 +1,6 @@
+# Mantém finais de linha LF no repositório, mesmo para quem usa Windows.
+# Evita erros como "/bin/sh^M: bad interpreter" dentro dos containers.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.svg text
