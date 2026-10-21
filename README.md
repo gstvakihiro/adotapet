@@ -1,147 +1,227 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/marca/GenA-logo-azul-fundo-escuro.png">
-  <source media="(prefers-color-scheme: light)" srcset="docs/marca/GenA-logo-azul-fundo-claro.png">
-  <img alt="GenA" src="docs/marca/GenA-logo-azul-fundo-claro.png" width="320">
-</picture>
+<img src="frontend/public/favicon.svg" alt="Logo do AdotaPet" width="96" />
 
-### Sistema web de pedidos para padaria
+# AdotaPet
 
-Lance os pedidos por horário, empresa e cliente, veja o que produzir e acompanhe vendas, lucro e rotas de entrega.
+**Plataforma web para adoção responsável de animais**
 
-<br>
+Aproxima quem quer adotar de quem cuida de animais disponíveis para adoção.
 
-![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![React](https://img.shields.io/badge/React-19-1f7aff?style=for-the-badge&logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-1f7aff?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-1f7aff?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-1f7aff?style=for-the-badge&logo=supabase&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-c2410c)
+
+[Sobre](#sobre) ·
+[Equipe](#equipe) ·
+[Andamento](#andamento) ·
+[Como rodar](#como-rodar) ·
+[Como contribuir](#como-contribuir)
 
 </div>
 
 ---
 
-## 📖 Sobre o projeto
+<a id="sobre"></a>
 
-O **GenA** substitui a folha A3 em que os pedidos de uma padaria eram anotados à mão. Os pedidos chegam pelo WhatsApp, são organizados **por empresa** (fábricas e comércios), separados por **cliente** (as pessoas de cada empresa) e entregues em um de três horários: **08:00, 14:00 e 15:30**.
+## 🐾 Sobre
 
+Hoje, os animais para adoção são divulgados em vários lugares diferentes, o que dificulta encontrar e comparar opções. O AdotaPet reúne essa divulgação num só lugar:
+
+- **Quem quer adotar** busca animais com filtros (espécie, sexo, idade, porte e cidade), vê os detalhes e demonstra interesse.
+- **Quem é responsável** por um animal (pessoa ou ONG) cadastra os animais, acompanha os interessados e responde a cada pedido.
+
+A plataforma cuida da descoberta e do primeiro contato. A avaliação e a adoção em si continuam com o responsável.
+
+> Projeto Integrado VIII · Engenharia de Computação · UNIFEV, Votuporanga – SP, 2026<br/>
+> Orientação: Prof. Dr. Fernando Kendy
+
+<a id="equipe"></a>
+
+## 👥 Equipe
+
+| Área | Integrantes |
+| :--- | :--- |
+| ⚙️ **Backend** (API, banco e Docker) | Patrick Ornelas · Dawid Rizzo · Gustavo Akihiro |
+| 🎨 **Frontend** (telas em React) | Guilherme Autulo · Fernando Tavares · Leonardo Gonçalves |
+| 🧪 **Testes de software** | Gabriel Movio |
+
+<a id="andamento"></a>
+
+## 🗺️ Andamento
+
+| Fase | Entrega | Responsáveis | Situação |
+| :---: | :--- | :--- | :---: |
+| 0 | Estrutura, Docker e repositório | Backend · Frontend · Gabriel (validação) | 🔄 |
+| 1 | Modelo de dados | Backend · Gabriel | ⏳ |
+| 2 | API de autenticação (RF01, RF02) | Backend · Gabriel | ⏳ |
+| 3 | API de animais (RF03–RF08) | Backend · Gabriel | ⏳ |
+| 4 | API de solicitações (RF09–RF11) | Backend · Gabriel | ⏳ |
+| 5 | Base do frontend, login e cadastro | Frontend · Backend (apoio) · Gabriel | ⏳ |
+| 6 | Telas do adotante | Frontend · Gabriel | ⏳ |
+| 7 | Telas do responsável | Frontend · Gabriel | ⏳ |
+| 8 | Qualidade: responsividade, acessibilidade e usabilidade | Gabriel (lidera) · todos | ⏳ |
+| 9 | Entrega final | Todos | ⏳ |
+
+✅ Concluída · 🔄 Em andamento · ⏳ A fazer
+
+Durante as fases 1 a 4, o time de frontend desenha os wireframes das telas.
+
+## 🏗️ Arquitetura
+
+```mermaid
+flowchart LR
+    U(["👤 Navegador"]) --> F["🎨 Frontend<br/>React + Vite<br/>porta 5173"]
+    F -- "JSON + JWT" --> B["⚙️ API<br/>Django + DRF<br/>porta 8000"]
+    B -- "ORM" --> D[("🐘 PostgreSQL<br/>porta 5432")]
 ```
-Empresa X
- ├─ Cliente 1   →  lanche, bebida
- └─ Cliente 2   →  lanche, bolacha
-```
 
-É uma aplicação web, aberta direto no navegador, sem instalar nada. Funciona no celular, no tablet e no computador.
+O React só conversa com a API, e só a API acessa o banco. Toda regra de negócio e de permissão fica no backend. Os três serviços rodam em containers Docker, iguais na máquina de todos.
 
-## ✨ Funcionalidades
+Todos os modelos herdam de `core.models.ModeloBase`, que usa **UUID** como chave primária (RNF07) para evitar que IDs sejam adivinhados pela URL.
 
-| | Funcionalidade | Situação |
-|---|---|---|
-| 🔐 | Login com e-mail e senha | ✅ Pronto |
-| 🏷️ | **Catálogo** de itens por categoria, com preço de venda e custo, por unidade ou por kg | ✅ Pronto |
-| 🏭 | **Empresas** (fábricas e comércios) com endereço | ✅ Pronto |
-| 👥 | **Clientes**, as pessoas de cada empresa | ✅ Pronto |
-| 📋 | **Pedidos** por data, horário, empresa e cliente | 🔜 Próxima fase |
-| 🧾 | Resumo de **produção** por horário | 🔜 Próxima fase |
-| 💳 | Forma de pagamento (PIX, dinheiro ou notinha) e lista de **a receber** | 🔜 Planejado |
-| 📊 | **Dashboard** de vendas e lucro, por semana e por mês | 🔜 Planejado |
-| 🗺️ | **Mapa** com a melhor rota de entrega de cada horário | 🔜 Planejado |
+<a id="como-rodar"></a>
 
-Itens por quilo (como bolacha) são lançados pelo **valor que saiu na balança**, e o sistema calcula o peso aproximado.
+## 🚀 Como rodar
 
-## 🧭 Andamento
-
-- [x] **Fase 0** · Preparação
-- [x] **Fase 1** · Projeto base e visual (menu lateral, tema claro e escuro, logo)
-- [x] **Fase 2** · Banco de dados e login
-- [x] **Fase 3** · Cadastros (catálogo, empresas e clientes)
-- [ ] **Fase 4** · Lançamento de pedidos
-- [ ] **Fase 5** · Dashboard
-- [ ] **Fase 6** · Mapa e rota de entrega
-- [ ] **Fase 7** · Testes com uso real e publicação
-
-O plano completo está em [`docs/plano-de-desenvolvimento.pdf`](docs/plano-de-desenvolvimento.pdf).
-
-## 🛠️ Tecnologias
-
-| Camada | Tecnologia |
-|---|---|
-| Site | [Next.js](https://nextjs.org) (App Router), [React](https://react.dev) e [TypeScript](https://www.typescriptlang.org) |
-| Estilo | [Tailwind CSS](https://tailwindcss.com) e CSS próprio, com modo claro e escuro |
-| Banco de dados e login | [Supabase](https://supabase.com) (PostgreSQL com controle de acesso por linha) |
-| Mapa e rota *(planejado)* | Mapcn (MapLibre) e OpenRouteService |
-
-## 🚀 Como rodar no seu computador
-
-Precisa do [Node.js](https://nodejs.org) (versão LTS) e do [Git](https://git-scm.com).
-
-**1. Instale as dependências**
+**Pré-requisitos:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) e [Git](https://git-scm.com/). Não precisa instalar Python, Node nem PostgreSQL: eles rodam dentro dos containers.
 
 ```bash
-npm install
+git clone https://github.com/gstvakihiro/adotapet.git
+cd adotapet
+cp .env.example .env
+docker compose up --build
 ```
 
-**2. Configure o acesso ao Supabase**
+A primeira vez demora alguns minutos, porque o Docker baixa as imagens e instala as dependências. Depois, abra:
 
-Copie o arquivo de exemplo e preencha com os dados do seu projeto (painel do Supabase, botão **Connect**):
+| Endereço | O que é |
+| :--- | :--- |
+| <http://localhost:5173> | 🌐 Site (React) |
+| <http://localhost:8000/api/health/> | 💚 Verificação da API e do banco |
+| <http://localhost:8000/admin/> | 🔧 Painel administrativo do Django |
+
+Ao salvar um arquivo, o servidor recarrega sozinho. Não precisa reiniciar os containers.
+
+<details>
+<summary><b>📋 Comandos do dia a dia</b></summary>
+
+<br/>
+
+Rode em outro terminal, com os containers ligados:
 
 ```bash
-cp .env.example .env.local
+# Criar um usuário administrador (para entrar em /admin)
+docker compose exec backend python manage.py createsuperuser
+
+# Criar e aplicar migrações depois de mudar um model
+docker compose exec backend python manage.py makemigrations
+docker compose exec backend python manage.py migrate
+
+# Rodar os testes do backend
+docker compose exec backend python manage.py test
+
+# Instalar um pacote no frontend (atualiza package.json e package-lock.json)
+docker compose exec frontend npm install <pacote>
+
+# Ver os logs de um serviço
+docker compose logs -f backend
+
+# Desligar tudo (os dados do banco continuam salvos)
+docker compose down
+
+# Desligar e APAGAR o banco (começar do zero)
+docker compose down -v
 ```
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+Ao adicionar um pacote Python, coloque-o no `backend/requirements.txt` com a versão fixa e rode `docker compose up --build`.
+
+</details>
+
+<details>
+<summary><b>🛠️ Problemas comuns</b></summary>
+
+<br/>
+
+| Problema | Solução |
+| :--- | :--- |
+| Porta já em uso (5432, 8000 ou 5173) | Outro programa está usando a porta. Feche-o (por exemplo, um PostgreSQL instalado na máquina) ou troque a porta da esquerda no `docker-compose.yml`. |
+| Mudei o `requirements.txt` ou o `package.json` e não funcionou | Rode `docker compose up --build`. |
+| A página não recarrega ao salvar (Windows) | Deixe o projeto fora de pastas sincronizadas pelo OneDrive (ex.: `C:\Projeto`) e confira se o Docker Desktop tem acesso à pasta. |
+
+</details>
+
+<details>
+<summary><b>📁 Estrutura de pastas</b></summary>
+
+<br/>
+
+```
+adotapet/
+├── backend/              API em Django
+│   ├── config/           configurações e rotas principais
+│   ├── core/             base comum (ModeloBase com UUID, /api/health/)
+│   ├── usuarios/         usuários e autenticação
+│   └── Dockerfile
+├── frontend/             site em React (Vite)
+│   ├── src/
+│   └── Dockerfile
+├── docker-compose.yml    sobe banco, backend e frontend juntos
+└── .env.example          modelo das variáveis de ambiente
 ```
 
-**3. Crie as tabelas**
+</details>
 
-No **SQL Editor** do Supabase, rode os arquivos de `supabase/migrations/` **na ordem**, uma vez cada:
+<a id="como-contribuir"></a>
 
-1. `0001_tabelas_iniciais.sql`
-2. `0002_empresas_e_clientes.sql`
+## 🤝 Como contribuir
 
-**4. Crie o usuário de acesso**
+```mermaid
+gitGraph
+    commit id: "Fase 0"
+    branch develop
+    checkout develop
+    branch feature/api-animais
+    checkout feature/api-animais
+    commit id: "feat: CRUD"
+    commit id: "test: permissoes"
+    checkout develop
+    merge feature/api-animais id: "PR aprovado"
+    checkout main
+    merge develop id: "Fim da fase"
+```
 
-No painel do Supabase, em **Authentication → Users**, use **Add user**. O cadastro aberto deve ficar **desligado**, para que só quem você criar consiga entrar.
-
-**5. Ligue o site**
+- **`main`**: versão estável, usada nas apresentações. Ninguém faz commit direto nela.
+- **`develop`**: onde as tarefas se juntam.
+- **`feature/<tarefa>`**: uma branch por tarefa, criada a partir da `develop`.
 
 ```bash
-npm run dev
+git checkout develop
+git pull
+git checkout -b feature/minha-tarefa
+# ... trabalha, faz commits ...
+git push -u origin feature/minha-tarefa
 ```
 
-Abra <http://localhost:3000>.
+Depois, abra um **Pull Request para a `develop`** no GitHub. O modelo do PR já vem com um checklist, e pelo menos 1 integrante precisa aprovar. Ao fim de cada fase, a `develop` é integrada na `main`.
 
-## 🗂️ Estrutura do projeto
+### Mensagens de commit
 
-```
-app/                    páginas: pedidos, dashboard, catalogo, empresas, clientes, login
-components/             menu lateral, ícones e peças reutilizáveis
-lib/supabase/           conexão com o Supabase (navegador, servidor e proteção de páginas)
-public/                 logos e fundo, nas versões clara e escura
-supabase/migrations/    scripts SQL das tabelas, em ordem
-docs/                   plano de desenvolvimento, protótipo visual e logos originais
-```
+Curtas, no imperativo, com prefixo:
 
-## 🔒 Segurança
-
-- Todas as tabelas têm **RLS** (controle de acesso por linha) ativado: só usuários logados leem ou alteram os dados.
-- Quem não está logado é levado para a tela de entrada.
-- **Nunca** suba senhas ou chaves para o GitHub. Elas ficam no `.env.local`, que já é ignorado pelo Git, e nas variáveis de ambiente da hospedagem.
-- A chave `service_role` do Supabase nunca é usada no navegador.
-
-## 📚 Documentação
-
-- [Plano de desenvolvimento](docs/plano-de-desenvolvimento.pdf): fases, modelo de dados, custos e decisões
-- [Protótipo clicável](docs/prototipo/prototipo-gena.html): abra no navegador para ver o visual e as regras de referência
-- [Logos](docs/marca): versões para fundo claro e escuro
+| Prefixo | Quando usar | Exemplo |
+| :--- | :--- | :--- |
+| `feat:` | Nova funcionalidade | `feat: cria rota de cadastro de animais` |
+| `fix:` | Correção | `fix: corrige filtro por cidade` |
+| `test:` | Testes | `test: cobre permissão de edição de animal` |
+| `docs:` | Documentação | `docs: atualiza README` |
+| `chore:` | Configuração e manutenção | `chore: atualiza dependências` |
 
 ---
 
 <div align="center">
-
-Feito para a padaria da família, em Valentim Gentil - SP. 🥖
-
+<sub>Feito com 🧡 pelo Grupo C · UNIFEV 2026</sub>
 </div>
