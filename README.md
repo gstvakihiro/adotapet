@@ -107,6 +107,40 @@ A primeira vez demora alguns minutos, porque o Docker baixa as imagens e instala
 Ao salvar um arquivo, o servidor recarrega sozinho. Não precisa reiniciar os containers.
 
 <details>
+<summary><b>🐧 Rodando no Linux</b></summary>
+
+<br/>
+
+**1. Instale o Docker e o Git** (Ubuntu, Debian ou Mint):
+
+```bash
+sudo apt update && sudo apt install -y git curl
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+```
+
+Saia da sessão e entre de novo (ou reinicie) para usar o `docker` sem `sudo`. Para testar: `docker run hello-world`.
+
+Em outras distribuições (Fedora, Arch etc.), instale o Docker pelo gerenciador de pacotes ou use o Docker Desktop para Linux.
+
+**2. Rode o projeto** com os mesmos comandos do "Como rodar" acima.
+
+**3. Atenção às permissões.** Dentro do container, os comandos rodam como root. No Linux, os arquivos que eles criam (migrações, apps novos) ficam com dono root na sua máquina. Para evitar isso, acrescente `-u $(id -u):$(id -g)` nos comandos que criam arquivos:
+
+```bash
+docker compose exec -u $(id -u):$(id -g) backend python manage.py makemigrations
+docker compose exec -u $(id -u):$(id -g) backend python manage.py startapp <nome>
+```
+
+Se algum arquivo já ficou com dono root, devolva a posse para o seu usuário:
+
+```bash
+sudo chown -R $USER:$USER .
+```
+
+</details>
+
+<details>
 <summary><b>📋 Comandos do dia a dia</b></summary>
 
 <br/>
