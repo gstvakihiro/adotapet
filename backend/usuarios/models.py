@@ -2,8 +2,11 @@ import uuid
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.functions import Lower
 
 from .managers import UsuarioManager
+
+MENSAGEM_EMAIL_REPETIDO = "Já existe um usuário com este email."
 
 
 class Usuario(AbstractUser):
@@ -30,12 +33,19 @@ class Usuario(AbstractUser):
         verbose_name = "usuário"
         verbose_name_plural = "usuários"
         ordering = ["nome"]
+        constraints = [
+            models.UniqueConstraint(
+                Lower("email"),
+                name="usuario_email_ci_unico",
+                violation_error_message=MENSAGEM_EMAIL_REPETIDO,
+            ),
+        ]
 
     def __str__(self):
         return self.nome or self.email
 
     def save(self, *args, **kwargs):
-        self.email = self.email.strip().lower()
+        self.email = UsuarioManager.normalizar_email(self.email)
         super().save(*args, **kwargs)
 
     def get_full_name(self):

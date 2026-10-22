@@ -1,5 +1,20 @@
+import django.db.models.functions.text
 import usuarios.managers
 from django.db import migrations, models
+
+
+def preencher_email_e_nome(apps, schema_editor):
+    Usuario = apps.get_model("usuarios", "Usuario")
+    usados = set()
+    for usuario in Usuario.objects.order_by("date_joined", "pk"):
+        email = (usuario.email or "").strip().lower()
+        if not email or email in usados:
+            email = f"sem-email-{usuario.pk}@adotapet.invalid"
+        usados.add(email)
+        nome = " ".join(parte for parte in (usuario.first_name, usuario.last_name) if parte)
+        usuario.email = email
+        usuario.nome = nome or usuario.username
+        usuario.save(update_fields=["email", "nome"])
 
 
 class Migration(migrations.Migration):
@@ -23,18 +38,6 @@ class Migration(migrations.Migration):
                 ("objects", usuarios.managers.UsuarioManager()),
             ],
         ),
-        migrations.RemoveField(
-            model_name="usuario",
-            name="first_name",
-        ),
-        migrations.RemoveField(
-            model_name="usuario",
-            name="last_name",
-        ),
-        migrations.RemoveField(
-            model_name="usuario",
-            name="username",
-        ),
         migrations.AddField(
             model_name="usuario",
             name="nome",
@@ -56,9 +59,30 @@ class Migration(migrations.Migration):
                 verbose_name="tipo",
             ),
         ),
+        migrations.RunPython(preencher_email_e_nome, migrations.RunPython.noop),
+        migrations.RemoveField(
+            model_name="usuario",
+            name="first_name",
+        ),
+        migrations.RemoveField(
+            model_name="usuario",
+            name="last_name",
+        ),
+        migrations.RemoveField(
+            model_name="usuario",
+            name="username",
+        ),
         migrations.AlterField(
             model_name="usuario",
             name="email",
             field=models.EmailField(max_length=254, unique=True, verbose_name="email"),
+        ),
+        migrations.AddConstraint(
+            model_name="usuario",
+            constraint=models.UniqueConstraint(
+                django.db.models.functions.text.Lower("email"),
+                name="usuario_email_ci_unico",
+                violation_error_message="Já existe um usuário com este email.",
+            ),
         ),
     ]
