@@ -7,9 +7,7 @@ from .models import MENSAGEM_EMAIL_REPETIDO, Usuario
 class EmailUnicoMixin:
     def clean_email(self):
         email = Usuario.objects.normalizar_email(self.cleaned_data.get("email"))
-        outros = Usuario.objects.filter(email__iexact=email)
-        if self.instance.pk:
-            outros = outros.exclude(pk=self.instance.pk)
+        outros = Usuario.objects.filter(email__iexact=email).exclude(pk=self.instance.pk)
         if outros.exists():
             raise forms.ValidationError(MENSAGEM_EMAIL_REPETIDO)
         return email

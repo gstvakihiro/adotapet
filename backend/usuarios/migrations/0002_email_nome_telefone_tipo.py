@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 verbose_name="tipo",
             ),
         ),
-        migrations.RunPython(preencher_email_e_nome, migrations.RunPython.noop),
+        migrations.RunPython(preencher_email_e_nome),
         migrations.RemoveField(
             model_name="usuario",
             name="first_name",
