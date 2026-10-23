@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # Apps do AdotaPet
     "core",
     "usuarios",
+    "animais",
 ]
 
 MIDDLEWARE = [
