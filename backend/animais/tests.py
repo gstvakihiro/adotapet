@@ -35,3 +35,10 @@ class AnimalTests(TestCase):
     def test_idade_negativa_invalida(self):
         with self.assertRaises(ValidationError):
             self.criar(idade=-1).full_clean()
+
+    def test_foto_so_aceita_jpg_png_webp(self):
+        for nome in ("rex.jpg", "rex.PNG", "rex.webp"):
+            self.criar(foto=nome).full_clean()
+        with self.assertRaises(ValidationError) as erro:
+            self.criar(foto="rex.gif").full_clean()
+        self.assertIn("foto", erro.exception.message_dict)

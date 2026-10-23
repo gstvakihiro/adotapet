@@ -1,8 +1,11 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from core.models import ModeloBase
+
+EXTENSOES_FOTO = ["jpg", "jpeg", "png", "webp"]
 
 
 class Animal(ModeloBase):
@@ -32,7 +35,12 @@ class Animal(ModeloBase):
     idade = models.PositiveSmallIntegerField("idade (anos)", help_text="0 = menos de 1 ano")
     porte = models.CharField("porte", max_length=10, choices=Porte.choices)
     status = models.CharField("status", max_length=10, choices=Status.choices, default=Status.DISPONIVEL)
-    foto = models.ImageField("foto", upload_to="animais/")
+    foto = models.ImageField(
+        "foto",
+        upload_to="animais/",
+        validators=[FileExtensionValidator(EXTENSOES_FOTO)],
+        help_text="Formatos aceitos: JPG, PNG ou WebP.",
+    )
     responsavel = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="responsável",
