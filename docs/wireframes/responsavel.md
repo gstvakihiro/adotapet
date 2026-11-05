@@ -10,8 +10,10 @@ Cada tela tem versão para computador (1280 px) e celular (390 px), conforme o R
 | :--- | :--- |
 | `responsavel-01-meus-animais-computador.png` · `responsavel-02-meus-animais-celular.png` | Meus animais, com o botão Disponível / Adotado em cada animal |
 | `responsavel-03-cadastro-animal-computador.png` · `responsavel-04-cadastro-animal-celular.png` | Formulário de cadastro de animal, com envio de foto |
-| `responsavel-05-foto-estados-e-edicao.png` | Estados do campo de foto (sem foto, erros, enviando) e modo edição |
+| `responsavel-05-foto-estados-e-edicao.png` | Estados do campo de foto (sem foto, erros, enviando), falha no envio e modo edição |
 | `responsavel-06-interessados-computador.png` · `responsavel-07-interessados-celular.png` | Interessados em um animal, com Aceitar e Recusar |
+| `responsavel-08-cadastro-erros-computador.png` · `responsavel-09-cadastro-erros-celular.png` | Erros dos campos do cadastro |
+| `responsavel-10-meus-animais-vazio-computador.png` · `responsavel-11-meus-animais-vazio-celular.png` | Meus animais vazio e filtro sem resultado |
 
 Textos entre colchetes, como `[Nome]`, são espaços para dados reais.
 
@@ -20,13 +22,32 @@ Textos entre colchetes, como `[Nome]`, são espaços para dados reais.
 - Cada animal tem um controle **Disponível / Adotado**, que troca o status na hora, sem abrir o formulário.
 - O animal adotado sai da busca pública, mas continua nesta lista. O aviso verde confirma a troca e oferece **Desfazer**.
 - Filtros por status: Todos, Disponíveis e Adotados.
-- O número em **Interessados** conta os pedidos ainda sem resposta. Sem pedidos, o botão fica desativado.
+- O número em **Interessados** conta as solicitações ainda sem resposta. Sem solicitações, o botão fica desativado.
+
+### Telas vazias
+
+- Responsável sem nenhum animal: "Você ainda não cadastrou nenhum animal", com **Cadastrar animal**. Os filtros não aparecem.
+- Filtro sem resultado: uma mensagem no lugar da grade, com **Ver todos**. "Nenhum animal adotado ainda" no filtro Adotados e "Nenhum animal disponível no momento" no filtro Disponíveis.
+- Em Interessados vale a mesma regra: "Nenhuma solicitação pendente", "Nenhuma solicitação aceita" ou "Nenhuma solicitação recusada", com **Ver todas**.
 
 ## Cadastro e edição de animal
 
 Os campos seguem o modelo `animais.Animal`: nome, espécie (cachorro, gato ou outro), sexo, idade em anos (0 = menos de 1 ano), porte, cidade, descrição (opcional) e foto.
 O status não está no formulário: começa como disponível e muda em Meus animais.
 A edição usa o mesmo formulário, já preenchido, com o título "Editar [Nome]", a foto atual com **Trocar foto** e o botão **Salvar alterações**.
+
+### Erros dos campos
+
+Ao enviar com campos inválidos, um aviso no topo pede para conferir os campos, e cada campo mostra a sua mensagem:
+
+| Caso | Mensagem |
+| :--- | :--- |
+| Nome vazio | "Informe o nome do animal." |
+| Espécie, sexo ou porte sem escolha | "Escolha a espécie.", "Escolha o sexo." ou "Escolha o porte." |
+| Idade vazia ou com letras | "Informe a idade em anos, só com números. Use 0 para menos de 1 ano." |
+| Cidade vazia | "Informe a cidade." |
+| Sem foto | "Escolha uma foto do animal." |
+| Envio que falha (rede ou servidor) | Aviso geral: "Não foi possível enviar. Confira sua conexão e tente de novo." O botão volta a funcionar, e a foto e os campos continuam preenchidos. |
 
 ### Foto
 
@@ -35,7 +56,6 @@ Segue a observação do Patrick na issue #10:
 - O backend aceita JPG, PNG e WebP. Os formatos aceitos aparecem escritos perto do campo.
 - O campo deve ser `<input type="file" accept="image/jpeg,image/png,image/webp">`, e não `accept="image/*"`, para o iPhone converter a foto HEIC em JPEG ao enviar.
 - Mensagens de erro previstas:
-  - sem foto: "Escolha uma foto do animal."
   - formato não aceito: "Este formato não é aceito. Envie a foto em JPG, PNG ou WebP."
   - arquivo que o Pillow não reconhece como imagem (vem do backend): "Não conseguimos abrir este arquivo como imagem. Tente outra foto."
 - O botão de envio tem o estado **Enviando…**, travado para não cadastrar duas vezes, porque fotos de celular pesam de 3 a 12 MB.
@@ -45,11 +65,31 @@ Segue a observação do Patrick na issue #10:
 ## Interessados
 
 - Aberta pelo botão **Interessados** de cada animal. Mostra um resumo do animal, com o mesmo controle Disponível / Adotado.
-- Pedidos pendentes aparecem primeiro, com **Aceitar** e **Recusar**. Os status são os mesmos da tela "Minhas solicitações" do adotante (#9): pendente, aceito ou recusado.
-- O contato do adotante (email e telefone, se informado) só aparece depois que o pedido é aceito.
-- Filtros: Todos, Pendentes, Aceitos e Recusados.
+- As solicitações pendentes aparecem primeiro, com **Aceitar** e **Recusar**. Os status são os do modelo `solicitacoes.SolicitacaoAdocao`: pendente, aceita ou recusada.
+- A data mostrada é a do `criado_em` da solicitação. A data da resposta não aparece, porque o modelo não guarda esse dado (o `atualizado_em` muda com qualquer alteração).
+- O contato do adotante (email e telefone, se informado) só aparece depois que a solicitação é aceita.
+- Filtros: Todas, Pendentes, Aceitas e Recusadas.
+
+## Texto longo
+
+O nome do animal e a cidade vão até 100 caracteres, e o nome do adotante e o do responsável até 150.
+
+- Cartões, linhas de interessados e o nome no cabeçalho usam uma linha só, com reticências no fim.
+- A linha de características (`[Espécie] · [Sexo] · [Idade] · [Porte]`) e a da cidade seguem a mesma regra.
+- Títulos, como "Interessados em [Nome]", e avisos quebram linha.
+- As etiquetas de status e os botões não encolhem: quem cede espaço é o texto.
+
+## Acessibilidade
+
+A borda dos controles usa `#857C70`, como na #14: campos, opções de rádio, botões Recusar e Editar, filtros, controle Disponível / Adotado, botão do lápis e tracejado da foto. Dá 4,1:1 no branco e 3,8:1 no fundo `#FAF7F2`, acima do mínimo de 3:1 (WCAG 1.4.11).
+Cartões e divisórias continuam com `#E7E1D8`, porque não são controles.
 
 ## Para o grupo decidir
 
-- Aceitar ou recusar sem pedir confirmação, com **Desfazer** no aviso (como desenhado), ou abrir uma confirmação antes.
-- Se aceitar um pedido deve marcar o animal como adotado automaticamente. No desenho, o responsável marca à mão quando a adoção se concretiza.
+- Aceitar ou recusar sem pedir confirmação, com **Desfazer** no aviso (como desenhado), ou abrir uma confirmação antes. Ponto do Guilherme: ao aceitar, o contato aparece na hora, e o Desfazer não apaga o que a outra pessoa já viu. A sugestão é confirmar antes de aceitar e deixar o Desfazer só para recusar.
+- Se aceitar uma solicitação deve marcar o animal como adotado automaticamente. No desenho, o responsável marca à mão quando a adoção se concretiza.
+- Se pode haver mais de uma solicitação aceita para o mesmo animal. Hoje as outras pendentes continuam com Aceitar.
+- O que acontece com as pendentes quando o animal é marcado como adotado: viram recusadas ou continuam pendentes. A mesma pergunta vale para a #16, do lado do adotante.
+- Para onde vai o item **Solicitações** do menu. Não há tela geral: as solicitações ficam em Interessados, por animal. Ou ele leva para Meus animais filtrado pelos que têm solicitação pendente, ou sai do menu.
+- Excluir animal: nenhuma tela prevê. Se o requisito de animais pedir exclusão, falta desenhar.
+- Limite de idade: o modelo aceita até 32767 anos. Ter ou não um limite é decisão do backend.
