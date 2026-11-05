@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "core",
     "usuarios",
     "animais",
+    "solicitacoes",
 ]
 
 MIDDLEWARE = [
