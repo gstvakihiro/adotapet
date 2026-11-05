@@ -21,7 +21,7 @@ Textos entre colchetes, como `[Nome]`, são espaços para dados reais.
 - Os filtros de espécie (Cachorro, Gato, Outro), sexo (Macho, Fêmea) e porte (Pequeno, Médio, Grande) são as `choices` do modelo `animais.Animal`.
 - A idade aparece em faixas sobre o campo inteiro `idade`: Filhote (0, menos de 1 ano), Jovem (1 a 3 anos), Adulto (4 a 7 anos) e Idoso (8 anos ou mais).
 - A cidade é uma lista de seleção.
-- No computador, os filtros ficam numa coluna ao lado dos cartões. No celular, abrem num painel pelo botão **Filtros (N)**, em que N é o número de opções marcadas, e o painel termina com **Limpar** e **Ver [N] animais**.
+- No computador, os filtros ficam numa coluna ao lado dos cartões. No celular, abrem num painel pelo botão **Filtros (N)**, em que N conta as opções marcadas e a cidade, quando escolhida, e o painel termina com **Limpar** e **Ver [N] animais**.
 - O cartão abre o detalhe do animal.
 
 ### Sem resultado
@@ -78,6 +78,9 @@ O nome do animal e a cidade vão até 100 caracteres, o nome do responsável at�
 
 A borda dos controles usa `#857C70`, como na #14: campo de cidade, filtros do celular, filtros de status e botão da conta. Dá 4,1:1 no branco e 3,8:1 no fundo `#FAF7F2`, acima do mínimo de 3:1 (WCAG 1.4.11).
 Cartões e divisórias continuam com `#E7E1D8`, porque não são controles.
+
+Todo controle tem área de toque de pelo menos 44 px, como pede o estilo da #8: botões, filtros, opções com caixa de seleção, o logo e o nome do animal em Minhas solicitações.
+No detalhe, a foto do responsável e o ícone da cidade não encolhem quando o texto ao lado é longo.
 
 ## Perguntas para o backend
 
