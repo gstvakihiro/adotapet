@@ -10,7 +10,7 @@ admin.site.index_title = "Painel administrativo"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("core.urls")),
-    # Fase 2: path("api/auth/", include("usuarios.urls")),
+    path("api/auth/", include("usuarios.urls")),
     # Fase 3: path("api/animais/", include("animais.urls")),
     # Fase 4: path("api/solicitacoes/", include("solicitacoes.urls")),
 ]
