@@ -7,7 +7,9 @@ from .models import MENSAGEM_EMAIL_REPETIDO, Usuario
 
 
 class CadastroSerializer(serializers.ModelSerializer):
-    senha = serializers.CharField(write_only=True, trim_whitespace=False, style={"input_type": "password"})
+    senha = serializers.CharField(
+        write_only=True, trim_whitespace=False, max_length=128, style={"input_type": "password"}
+    )
 
     class Meta:
         model = Usuario
@@ -23,6 +25,11 @@ class CadastroSerializer(serializers.ModelSerializer):
         if Usuario.objects.filter(email__iexact=email).exists():
             raise serializers.ValidationError(MENSAGEM_EMAIL_REPETIDO)
         return email
+
+    def validate_senha(self, senha):
+        if not senha.strip():
+            raise serializers.ValidationError("A senha não pode ser formada só por espaços.")
+        return senha
 
     def validate(self, dados):
         candidato = Usuario(email=dados["email"], nome=dados["nome"])
