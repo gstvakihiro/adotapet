@@ -49,6 +49,8 @@ Ao enviar com campos inválidos, um aviso no topo pede para conferir os campos, 
 | Sem foto | "Escolha uma foto do animal." |
 | Envio que falha (rede ou servidor) | Aviso geral: "Não foi possível enviar. Confira sua conexão e tente de novo." O botão volta a funcionar, e a foto e os campos continuam preenchidos. |
 
+Nome e cidade usam `maxlength="100"`, o mesmo limite do `max_length` do `Animal`. O campo para de aceitar letras no 100º caractere, então não precisa de mensagem, e o usuário não descobre o limite só depois de enviar uma foto de até 12 MB.
+
 ### Foto
 
 Segue a observação do Patrick na issue #10:
@@ -69,6 +71,15 @@ Segue a observação do Patrick na issue #10:
 - A data mostrada é a do `criado_em` da solicitação. A data da resposta não aparece, porque o modelo não guarda esse dado (o `atualizado_em` muda com qualquer alteração).
 - O contato do adotante (email e telefone, se informado) só aparece depois que a solicitação é aceita.
 - Filtros: Todas, Pendentes, Aceitas e Recusadas.
+
+### Falha em Aceitar, Recusar e no controle de status
+
+Valem para Aceitar e Recusar, em Interessados, e para o controle Disponível / Adotado, em Meus animais e em Interessados:
+
+| Momento | O que acontece |
+| :--- | :--- |
+| Enquanto envia | O botão clicado fica travado, para um duplo clique não mandar duas vezes. |
+| Se falhar (rede ou servidor) | Aviso de erro igual ao do painel G do `responsavel-05`: "Não foi possível salvar. Confira sua conexão e tente de novo." A tela volta ao status anterior. |
 
 ## Texto longo
 
@@ -93,3 +104,4 @@ Cartões e divisórias continuam com `#E7E1D8`, porque não são controles.
 - Para onde vai o item **Solicitações** do menu. Não há tela geral: as solicitações ficam em Interessados, por animal. Ou ele leva para Meus animais filtrado pelos que têm solicitação pendente, ou sai do menu.
 - Excluir animal: nenhuma tela prevê. Se o requisito de animais pedir exclusão, falta desenhar.
 - Limite de idade: o modelo aceita até 32767 anos. Ter ou não um limite é decisão do backend.
+- Cidade e UF: o campo sugere "Ex.: Votuporanga – SP", e tudo vira texto livre no `cidade`. A #16 pediu um campo `uf` ao backend. Se ele entrar, o formulário ganha um campo de UF separado.
