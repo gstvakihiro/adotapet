@@ -30,6 +30,18 @@ class MeTests(APITestCase):
             },
         )
 
+    def test_token_do_cadastro_funciona_no_me(self):
+        cadastro = self.client.post(
+            reverse("cadastro"),
+            {"email": "bia@exemplo.com", "nome": "Bia", "tipo": "responsavel", "senha": "uma-senha-forte-123"},
+            format="json",
+        )
+        self.assertEqual(cadastro.status_code, 201)
+        resposta = self.client.get(self.url, HTTP_AUTHORIZATION=f"Bearer {cadastro.json()['access']}")
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.json()["email"], "bia@exemplo.com")
+        self.assertEqual(resposta.json()["tipo"], "responsavel")
+
     def test_sem_token_responde_401(self):
         self.assertEqual(self.client.get(self.url).status_code, 401)
 
