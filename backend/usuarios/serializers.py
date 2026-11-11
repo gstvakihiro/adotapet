@@ -1,6 +1,6 @@
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
 from .models import MENSAGEM_EMAIL_REPETIDO, Usuario
@@ -42,6 +42,9 @@ class CadastroSerializer(serializers.ModelSerializer):
     def create(self, dados):
         senha = dados.pop("senha")
         try:
-            return Usuario.objects.create_user(password=senha, **dados)
+            with transaction.atomic():
+                return Usuario.objects.create_user(password=senha, **dados)
         except IntegrityError:
-            raise serializers.ValidationError({"email": [MENSAGEM_EMAIL_REPETIDO]})
+            if Usuario.objects.filter(email__iexact=dados["email"]).exists():
+                raise serializers.ValidationError({"email": [MENSAGEM_EMAIL_REPETIDO]})
+            raise
