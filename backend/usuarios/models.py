@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models.functions import Lower
 
 from .managers import UsuarioManager
+from .validators import validar_telefone
 
 MENSAGEM_EMAIL_REPETIDO = "Já existe um usuário com este email."
 
@@ -21,7 +22,7 @@ class Usuario(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField("email", unique=True)
     nome = models.CharField("nome", max_length=150)
-    telefone = models.CharField("telefone", max_length=20, blank=True)
+    telefone = models.CharField("telefone", max_length=20, blank=True, validators=[validar_telefone])
     tipo = models.CharField("tipo", max_length=20, choices=Tipo.choices, default=Tipo.ADOTANTE)
 
     USERNAME_FIELD = "email"
