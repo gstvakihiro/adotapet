@@ -1,7 +1,9 @@
 from django.urls import path
 
-from .views import CadastroView
+from .views import CadastroView, LoginView, RenovarTokenView
 
 urlpatterns = [
     path("cadastro/", CadastroView.as_view(), name="cadastro"),
+    path("login/", LoginView.as_view(), name="login"),
+    path("token/renovar/", RenovarTokenView.as_view(), name="token_renovar"),
 ]
