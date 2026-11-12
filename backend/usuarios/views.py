@@ -1,9 +1,9 @@
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .serializers import CadastroSerializer, LoginSerializer
+from .serializers import CadastroSerializer, LoginSerializer, RenovarTokenSerializer
 from .tokens import gerar_tokens
 
 
@@ -21,3 +21,7 @@ class CadastroView(generics.CreateAPIView):
 
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
+
+
+class RenovarTokenView(TokenRefreshView):
+    serializer_class = RenovarTokenSerializer

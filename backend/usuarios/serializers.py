@@ -2,7 +2,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
 from .models import MENSAGEM_EMAIL_REPETIDO, Usuario
 from .tokens import adicionar_dados_do_usuario
@@ -57,6 +58,7 @@ class LoginSerializer(TokenObtainPairSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields[self.username_field] = serializers.CharField(write_only=True, max_length=254)
         del self.fields["password"]
         self.fields["senha"] = serializers.CharField(
             write_only=True, trim_whitespace=False, max_length=128, style={"input_type": "password"}
@@ -69,3 +71,11 @@ class LoginSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, usuario):
         return adicionar_dados_do_usuario(super().get_token(usuario), usuario)
+
+
+class RenovarTokenSerializer(TokenRefreshSerializer):
+    def validate(self, dados):
+        try:
+            return super().validate(dados)
+        except Usuario.DoesNotExist:
+            raise AuthenticationFailed(self.error_messages["no_active_account"], "no_active_account")
