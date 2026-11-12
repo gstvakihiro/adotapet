@@ -96,7 +96,7 @@ O nome do animal e a cidade vão até 100 caracteres, e o nome do adotante e o d
 A borda dos controles usa `#857C70`, como na #14: campos, opções de rádio, botões Recusar e Editar, filtros, controle Disponível / Adotado, botão do lápis e tracejado da foto. Dá 4,1:1 no branco e 3,8:1 no fundo `#FAF7F2`, acima do mínimo de 3:1 (WCAG 1.4.11).
 Cartões e divisórias continuam com `#E7E1D8`, porque não são controles.
 
-Todo alvo de toque tem pelo menos 44 px de altura, como pede o estilo da #8: botões, campos, filtros, controle de status, os links do cabeçalho (Início, Meus animais e Solicitações), o logo e o **Desfazer** do aviso no computador, que ali é um botão à parte. No celular o **Desfazer** fica dentro da frase do aviso, como link de texto.
+Todo alvo de toque tem pelo menos 44 px de altura, como pede o estilo da #8: botões, campos, filtros, controle de status, os links do cabeçalho (Início, Meus animais e Solicitações), o logo, o **Desfazer** do aviso no computador, que ali é um botão à parte, e os links de email e telefone do adotante aceito em Interessados. No celular o **Desfazer** fica dentro da frase do aviso, como link de texto.
 
 ## Para o grupo decidir
 
