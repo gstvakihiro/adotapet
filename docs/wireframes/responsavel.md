@@ -86,7 +86,8 @@ Valem para Aceitar e Recusar, em Interessados, e para o controle Disponível / A
 O nome do animal e a cidade vão até 100 caracteres, e o nome do adotante e o do responsável até 150.
 
 - Cartões, linhas de interessados e o nome no cabeçalho usam uma linha só, com reticências no fim.
-- A linha de características (`[Espécie] · [Sexo] · [Idade] · [Porte]`) e a da cidade seguem a mesma regra.
+- As características viram dois pares fixos nos cartões do celular e no resumo do animal em Interessados (computador e celular), como na #16: `[Espécie] · [Sexo]` numa linha e `[Idade] · [Porte]` na outra. Com dados reais, como "Cachorro · Fêmea · Menos de 1 ano · Pequeno", a linha única cortava o porte. Nos cartões de Meus animais no computador ela cabe, então fica numa linha só.
+- Cada par e a linha da cidade seguem a mesma regra de uma linha com reticências.
 - Títulos, como "Interessados em [Nome]", e avisos quebram linha.
 - As etiquetas de status e os botões não encolhem: quem cede espaço é o texto.
 
@@ -94,6 +95,8 @@ O nome do animal e a cidade vão até 100 caracteres, e o nome do adotante e o d
 
 A borda dos controles usa `#857C70`, como na #14: campos, opções de rádio, botões Recusar e Editar, filtros, controle Disponível / Adotado, botão do lápis e tracejado da foto. Dá 4,1:1 no branco e 3,8:1 no fundo `#FAF7F2`, acima do mínimo de 3:1 (WCAG 1.4.11).
 Cartões e divisórias continuam com `#E7E1D8`, porque não são controles.
+
+Todo alvo de toque tem pelo menos 44 px de altura, como pede o estilo da #8: botões, campos, filtros, controle de status, os links do cabeçalho (Início, Meus animais e Solicitações), o logo e o **Desfazer** do aviso no computador, que ali é um botão à parte. No celular o **Desfazer** fica dentro da frase do aviso, como link de texto.
 
 ## Para o grupo decidir
 
