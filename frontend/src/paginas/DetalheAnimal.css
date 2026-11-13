@@ -1,0 +1,106 @@
+.detalhe {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.foto-grande {
+  aspect-ratio: 1;
+  border-radius: var(--raio-cartao);
+}
+
+.detalhe-info {
+  padding: 32px;
+  display: grid;
+  gap: 20px;
+}
+
+.detalhe-cidade {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--texto-secundario);
+  overflow-wrap: anywhere;
+}
+
+.detalhe-cidade svg {
+  flex: none;
+}
+
+.detalhe-dados {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0;
+}
+
+.detalhe-dados div {
+  background: var(--fundo);
+  border-radius: var(--raio);
+  padding: 10px 16px;
+}
+
+.detalhe-dados dt {
+  font-size: 13px;
+  color: var(--texto-secundario);
+}
+
+.detalhe-dados dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.detalhe-sobre {
+  display: grid;
+  gap: 8px;
+}
+
+.detalhe-sobre p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.detalhe-responsavel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--borda-cartao);
+  overflow-wrap: anywhere;
+}
+
+.interesse-info {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.interesse-info p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 600;
+}
+
+.interesse-info .botao-texto {
+  color: var(--primaria);
+  padding-left: 0;
+}
+
+@media (max-width: 820px) {
+  .detalhe {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .foto-grande {
+    aspect-ratio: 4 / 3;
+  }
+
+  .detalhe-info {
+    padding: 20px 16px;
+  }
+}

@@ -19,6 +19,7 @@ Aproxima quem quer adotar de quem cuida de animais disponíveis para adoção.
 [Equipe](#equipe) ·
 [Andamento](#andamento) ·
 [Como rodar](#como-rodar) ·
+[Demonstração](#demonstracao) ·
 [Como contribuir](#como-contribuir)
 
 </div>
@@ -55,33 +56,57 @@ A plataforma cuida da descoberta e do primeiro contato. A avaliação e a adoç�
 
 | Fase | Entrega | Responsáveis | Situação |
 | :---: | :--- | :--- | :---: |
-| 0 | Estrutura, Docker e repositório | Backend · Frontend · Gabriel (validação) | 🔄 |
-| 1 | Modelo de dados | Backend · Gabriel | ⏳ |
-| 2 | API de autenticação (RF01, RF02) | Backend · Gabriel | ⏳ |
-| 3 | API de animais (RF03–RF08) | Backend · Gabriel | ⏳ |
-| 4 | API de solicitações (RF09–RF11) | Backend · Gabriel | ⏳ |
-| 5 | Base do frontend, login e cadastro | Frontend · Backend (apoio) · Gabriel | ⏳ |
-| 6 | Telas do adotante | Frontend · Gabriel | ⏳ |
-| 7 | Telas do responsável | Frontend · Gabriel | ⏳ |
-| 8 | Qualidade: responsividade, acessibilidade e usabilidade | Gabriel (lidera) · todos | ⏳ |
-| 9 | Entrega final | Todos | ⏳ |
+| 0 | Estrutura, Docker e repositório | Backend · Frontend · Gabriel (validação) | ✅ |
+| 1 | Modelo de dados e wireframes | Backend · Frontend · Gabriel | ✅ |
+| 2 | API de autenticação (RF01, RF02) | Backend · Gabriel | ✅ |
+| 3 | API de animais (RF03–RF08) | Backend · Gabriel | ✅ |
+| 4 | API de solicitações (RF09–RF11) | Backend · Gabriel | ✅ |
+| 5 | Base do frontend, login e cadastro | Frontend · Backend (apoio) · Gabriel | ✅ |
+| 6 | Telas do adotante | Frontend · Gabriel | ✅ |
+| 7 | Telas do responsável | Frontend · Gabriel | ✅ |
+| 8 | Qualidade: responsividade, acessibilidade e usabilidade | Gabriel (lidera) · todos | 🔄 |
+| 9 | Entrega final | Todos | 🔄 |
 
 ✅ Concluída · 🔄 Em andamento · ⏳ A fazer
 
-Durante as fases 1 a 4, o time de frontend desenha os wireframes das telas.
+As telas seguem os wireframes de [`docs/wireframes/`](docs/wireframes/).
 
 ## 🏗️ Arquitetura
 
 ```mermaid
 flowchart LR
-    U(["👤 Navegador"]) --> F["🎨 Frontend<br/>React + Vite<br/>porta 5173"]
-    F -- "JSON + JWT" --> B["⚙️ API<br/>Django + DRF<br/>porta 8000"]
+    U(["👤 Navegador ou celular"]) --> F["🎨 Frontend<br/>React + Vite<br/>porta 5173"]
+    F -- "/api e /media (proxy)<br/>JSON + JWT" --> B["⚙️ API<br/>Django + DRF<br/>porta 8000"]
     B -- "ORM" --> D[("🐘 PostgreSQL<br/>porta 5432")]
 ```
 
-O React só conversa com a API, e só a API acessa o banco. Toda regra de negócio e de permissão fica no backend. Os três serviços rodam em containers Docker, iguais na máquina de todos.
+O React só conversa com a API, e só a API acessa o banco. Toda regra de negócio e de permissão fica no backend. O navegador acessa tudo pela porta 5173: o Vite repassa `/api` e `/media` para o Django, então um celular na mesma rede só precisa de um endereço. Os três serviços rodam em containers Docker, iguais na máquina de todos.
 
 Todos os modelos herdam de `core.models.ModeloBase`, que usa **UUID** como chave primária (RNF07) para evitar que IDs sejam adivinhados pela URL.
+
+<details>
+<summary><b>🔌 Rotas da API</b></summary>
+
+<br/>
+
+| Método e rota | Quem pode | O que faz |
+| :--- | :--- | :--- |
+| `POST /api/auth/cadastro/` | Todos | Cria a conta e já devolve os tokens |
+| `POST /api/auth/login/` | Todos | Login por email e senha (JWT) |
+| `POST /api/auth/token/renovar/` | Todos | Gera um novo token de acesso |
+| `GET` · `PATCH /api/auth/me/` | Logado | Dados do usuário (e nº de solicitações pendentes do responsável); edita nome e telefone |
+| `GET /api/animais/` | Todos | Animais disponíveis, com filtros `especie`, `sexo`, `porte`, `idade` (filhote, jovem, adulto, idoso), `cidade` e `uf`; várias opções separadas por vírgula |
+| `GET /api/animais/cidades/` | Todos | Cidades com animais disponíveis |
+| `GET /api/animais/<id>/` | Todos | Detalhe do animal (e a solicitação do adotante logado, se houver) |
+| `GET` · `POST /api/meus-animais/` | Responsável | Lista e cadastra animais (foto até 12 MB, girada e reduzida a 1600 px) |
+| `GET` · `PATCH /api/meus-animais/<id>/` | Responsável dono | Detalhe, edição e troca de status |
+| `GET /api/meus-animais/<id>/solicitacoes/` | Responsável dono | Interessados, pendentes primeiro |
+| `GET` · `POST /api/solicitacoes/` | Adotante | Minhas solicitações; demonstra interesse |
+| `PATCH /api/solicitacoes/<id>/` | Responsável dono | Aceita, recusa ou volta para pendente (uma aceita por animal) |
+
+O contato (email e telefone) de cada lado só aparece depois que a solicitação é aceita.
+
+</details>
 
 <a id="como-rodar"></a>
 
@@ -208,6 +233,43 @@ adotapet/
 ```
 
 </details>
+
+<a id="demonstracao"></a>
+
+## 📱 Demonstração (usar pelo celular)
+
+**1. Atualizar e subir.** O frontend ganhou dependências novas, então recrie os containers com `--renew-anon-volumes` (senão o Docker reaproveita o `node_modules` antigo e a página fica em branco):
+
+```bash
+git checkout develop
+git pull
+docker compose up --build --renew-anon-volumes
+```
+
+**2. Dados de exemplo.** Em outro terminal, crie contas e animais de demonstração (todos com email `@adotapet.demo`):
+
+```bash
+docker compose exec backend python manage.py popular_demo
+```
+
+Senha de todas: `AdotaPet2026!`
+
+| Conta | Tipo |
+| :--- | :--- |
+| `ong@adotapet.demo` (ONG Patas Amigas) | Responsável |
+| `maria@adotapet.demo` (Maria Souza) | Responsável |
+| `joao@adotapet.demo` (João Pereira) | Adotante |
+| `ana@adotapet.demo` (Ana Lima) | Adotante |
+
+Para recomeçar do zero: `docker compose exec backend python manage.py popular_demo --limpar`. As contas e os animais que vocês criarem no dia não são apagados.
+
+**3. Abrir pelo celular.** Notebook e celulares precisam estar na **mesma rede** (o Wi-Fi do local ou o roteador de um dos celulares).
+
+1. No notebook, descubra o IP: no Windows, rode `ipconfig` e procure **Endereço IPv4** (ex.: `192.168.0.15`); no Linux, `hostname -I`.
+2. No celular, abra `http://<IP do notebook>:5173` (ex.: `http://192.168.0.15:5173`).
+3. Se não abrir no Windows, permita o **Docker Desktop** no Firewall do Windows para redes privadas (ele costuma perguntar na primeira vez) e confira se a rede está como **Privada**.
+
+No celular, o campo de foto do cadastro de animal abre a câmera ou a galeria.
 
 <a id="como-contribuir"></a>
 

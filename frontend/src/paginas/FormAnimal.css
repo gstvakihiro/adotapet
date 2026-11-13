@@ -1,0 +1,107 @@
+.conteudo-formulario {
+  max-width: 760px;
+}
+
+.form-animal {
+  padding: 32px;
+}
+
+.area-foto {
+  border: 2px dashed var(--borda-campo);
+  border-radius: var(--raio-cartao);
+  background: var(--foto);
+  aspect-ratio: 16 / 10;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  text-align: center;
+  color: var(--texto-secundario);
+}
+
+.area-foto.arrastando {
+  border-color: var(--primaria);
+  background: var(--primaria-clara);
+}
+
+.area-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.area-foto-vazia {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 16px;
+}
+
+.campo[data-erro='true'] .area-foto {
+  border-color: var(--erro);
+}
+
+.escolha {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.escolha-opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.escolha-opcao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--borda-campo);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  cursor: pointer;
+}
+
+.escolha-opcao[data-marcado='true'] {
+  border-color: var(--primaria);
+  background: var(--primaria-clara);
+  color: var(--primaria-escura);
+  font-weight: 600;
+}
+
+.escolha-opcao input {
+  accent-color: var(--primaria);
+  margin: 0;
+}
+
+.campo[data-erro='true'] .escolha-opcao {
+  border-color: var(--erro);
+}
+
+.formulario-cidade {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 16px;
+}
+
+.form-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .form-animal {
+    padding: 20px 16px;
+  }
+
+  .form-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .form-acoes .botao {
+    width: 100%;
+  }
+}

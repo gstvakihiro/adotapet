@@ -11,8 +11,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("core.urls")),
     path("api/auth/", include("usuarios.urls")),
-    # Fase 3: path("api/animais/", include("animais.urls")),
-    # Fase 4: path("api/solicitacoes/", include("solicitacoes.urls")),
+    path("api/", include("animais.urls")),
+    path("api/", include("solicitacoes.urls")),
 ]
 
 if settings.DEBUG:

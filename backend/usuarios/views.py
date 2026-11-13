@@ -27,11 +27,12 @@ class RenovarTokenView(TokenRefreshView):
     serializer_class = RenovarTokenSerializer
 
 
-class MeView(generics.RetrieveAPIView):
+class MeView(generics.RetrieveUpdateAPIView):
     """Devolve quem está logado, a partir do token enviado no cabeçalho."""
 
     serializer_class = UsuarioSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "patch", "head", "options"]
 
     def get_object(self):
         return self.request.user
