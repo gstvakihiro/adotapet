@@ -1,0 +1,108 @@
+.conteudo-estreito {
+  max-width: 880px;
+}
+
+.lista-solicitacoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.linha-solicitacao {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  min-width: 0;
+}
+
+.miniatura {
+  width: 112px;
+  flex: none;
+  align-self: flex-start;
+}
+
+.miniatura .foto-animal {
+  aspect-ratio: 1;
+  border-radius: 12px;
+}
+
+.linha-corpo {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.linha-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.linha-nome {
+  font-family: Nunito, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--texto);
+  text-decoration: none;
+  min-height: 32px;
+  display: block;
+}
+
+.linha-nome:hover {
+  color: var(--primaria);
+}
+
+.contato-bloco {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: var(--raio);
+  background: #f0fdf4;
+  display: grid;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+
+.contato {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+
+.contato a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: #14532d;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.contato svg {
+  flex: none;
+}
+
+@media (max-width: 600px) {
+  .linha-solicitacao {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .miniatura {
+    width: 72px;
+  }
+
+  .linha-topo {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  .linha-nome {
+    font-size: 18px;
+  }
+}
