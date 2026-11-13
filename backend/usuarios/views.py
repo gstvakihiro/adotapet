@@ -1,8 +1,9 @@
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .serializers import CadastroSerializer, UsuarioSerializer
+from .serializers import CadastroSerializer, LoginSerializer, RenovarTokenSerializer, UsuarioSerializer
 from .tokens import gerar_tokens
 
 
@@ -16,6 +17,14 @@ class CadastroView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         usuario = serializer.save()
         return Response({**serializer.data, **gerar_tokens(usuario)}, status=status.HTTP_201_CREATED)
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
+
+class RenovarTokenView(TokenRefreshView):
+    serializer_class = RenovarTokenSerializer
 
 
 class MeView(generics.RetrieveAPIView):
