@@ -42,6 +42,22 @@ class MeTests(APITestCase):
         self.assertEqual(resposta.json()["email"], "bia@exemplo.com")
         self.assertEqual(resposta.json()["tipo"], "responsavel")
 
+    def test_token_do_login_funciona_no_me(self):
+        login = self.client.post(
+            reverse("login"), {"email": "ana@exemplo.com", "senha": "senha-forte-123"}, format="json"
+        )
+        self.assertEqual(login.status_code, 200)
+        resposta = self.client.get(self.url, HTTP_AUTHORIZATION=f"Bearer {login.json()['access']}")
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.json()["email"], "ana@exemplo.com")
+
+    def test_token_refresh_no_lugar_do_access_responde_401(self):
+        login = self.client.post(
+            reverse("login"), {"email": "ana@exemplo.com", "senha": "senha-forte-123"}, format="json"
+        )
+        resposta = self.client.get(self.url, HTTP_AUTHORIZATION=f"Bearer {login.json()['refresh']}")
+        self.assertEqual(resposta.status_code, 401)
+
     def test_sem_token_responde_401(self):
         self.assertEqual(self.client.get(self.url).status_code, 401)
 
