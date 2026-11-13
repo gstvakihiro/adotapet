@@ -6,6 +6,7 @@ from animais.models import Animal
 from core.models import ModeloBase
 
 MENSAGEM_SOLICITACAO_REPETIDA = "Este adotante já tem uma solicitação para este animal."
+MENSAGEM_JA_EXISTE_ACEITA = "Este animal já tem uma solicitação aceita."
 
 
 class SolicitacaoAdocao(ModeloBase):
@@ -40,6 +41,12 @@ class SolicitacaoAdocao(ModeloBase):
                 fields=["adotante", "animal"],
                 name="solicitacao_adotante_animal_unica",
                 violation_error_message=MENSAGEM_SOLICITACAO_REPETIDA,
+            ),
+            models.UniqueConstraint(
+                fields=["animal"],
+                condition=models.Q(status="aceita"),
+                name="solicitacao_uma_aceita_por_animal",
+                violation_error_message=MENSAGEM_JA_EXISTE_ACEITA,
             ),
         ]
 
