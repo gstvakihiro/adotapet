@@ -79,3 +79,12 @@ class RenovarTokenSerializer(TokenRefreshSerializer):
             return super().validate(dados)
         except Usuario.DoesNotExist:
             raise AuthenticationFailed(self.error_messages["no_active_account"], "no_active_account")
+
+
+class UsuarioSerializer(serializers.ModelSerializer):
+    """Dados públicos do usuário logado, usados no /me."""
+
+    class Meta:
+        model = Usuario
+        fields = ("id", "email", "nome", "telefone", "tipo")
+        read_only_fields = ("id", "email", "tipo")

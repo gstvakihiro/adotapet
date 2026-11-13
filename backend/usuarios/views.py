@@ -1,9 +1,9 @@
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .serializers import CadastroSerializer, LoginSerializer, RenovarTokenSerializer
+from .serializers import CadastroSerializer, LoginSerializer, RenovarTokenSerializer, UsuarioSerializer
 from .tokens import gerar_tokens
 
 
@@ -25,3 +25,13 @@ class LoginView(TokenObtainPairView):
 
 class RenovarTokenView(TokenRefreshView):
     serializer_class = RenovarTokenSerializer
+
+
+class MeView(generics.RetrieveAPIView):
+    """Devolve quem está logado, a partir do token enviado no cabeçalho."""
+
+    serializer_class = UsuarioSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
