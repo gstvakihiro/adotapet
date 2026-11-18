@@ -15,7 +15,7 @@ class SolicitacaoAdocaoTests(TestCase):
         )
         self.adotante = Usuario.objects.create_user(email="ana@exemplo.com", password="senha-forte-123", nome="Ana")
         self.animal = Animal.objects.create(
-            nome="Rex", cidade="Votuporanga", especie=Animal.Especie.CACHORRO, sexo=Animal.Sexo.MACHO,
+            nome="Rex", cidade="Votuporanga", uf="SP", especie=Animal.Especie.CACHORRO, sexo=Animal.Sexo.MACHO,
             idade=2, porte=Animal.Porte.MEDIO, foto="animais/rex.jpg", responsavel=self.responsavel,
         )
 
