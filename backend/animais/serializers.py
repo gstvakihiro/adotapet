@@ -1,3 +1,4 @@
+from PIL import Image
 from rest_framework import serializers
 
 from .imagens import TAMANHO_MAXIMO_BYTES, preparar_foto
@@ -22,7 +23,10 @@ class AnimalPublicoSerializer(serializers.ModelSerializer):
         usuario = getattr(self.context.get("request"), "user", None)
         if not usuario or not usuario.is_authenticated or not usuario.is_adotante:
             return None
-        solicitacao = animal.solicitacoes.filter(adotante=usuario).first()
+        minhas = getattr(animal, "minhas_solicitacoes", None)
+        if minhas is None:
+            minhas = list(animal.solicitacoes.filter(adotante=usuario))
+        solicitacao = minhas[0] if minhas else None
         return {"id": solicitacao.id, "status": solicitacao.status} if solicitacao else None
 
 
@@ -72,4 +76,7 @@ class AnimalResponsavelSerializer(serializers.ModelSerializer):
     def validate_foto(self, foto):
         if foto.size > TAMANHO_MAXIMO_BYTES:
             raise serializers.ValidationError("A foto passa de 12 MB. Escolha uma foto menor.")
-        return preparar_foto(foto)
+        try:
+            return preparar_foto(foto)
+        except (OSError, Image.DecompressionBombError):
+            raise serializers.ValidationError("Não conseguimos abrir este arquivo como imagem. Tente outra foto.")

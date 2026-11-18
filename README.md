@@ -271,6 +271,8 @@ Para recomeçar do zero: `docker compose exec backend python manage.py popular_d
 
 No celular, o campo de foto do cadastro de animal abre a câmera ou a galeria.
 
+> ⚠️ **Só para desenvolvimento e demonstração.** Com `DJANGO_DEBUG=True` (o padrão do `.env.example`), o backend aceita qualquer endereço e qualquer origem (`ALLOWED_HOSTS = ["*"]` e `CORS_ALLOW_ALL_ORIGINS`), e o Vite aceita qualquer host. É isso que deixa o celular abrir pela rede local. Para publicar na internet, use `DJANGO_DEBUG=False`, uma `DJANGO_SECRET_KEY` própria e preencha `DJANGO_ALLOWED_HOSTS` e `CORS_ALLOWED_ORIGINS` com o endereço real.
+
 <a id="como-contribuir"></a>
 
 ## 🤝 Como contribuir

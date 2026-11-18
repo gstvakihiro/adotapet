@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
 
@@ -131,3 +133,22 @@ class AnimalApiTests(ApiTestCase):
         self.assertEqual((animal.status, animal.nome, animal.foto.name), ("adotado", "Rex II", "animais/rex.jpg"))
         self.assertEqual(len(self.client.get("/api/meus-animais/?status=disponivel").data), 0)
 
+    def test_foto_cortada_volta_400(self):
+        buffer = BytesIO()
+        Image.effect_noise((800, 600), 80).convert("RGB").save(buffer, "JPEG", quality=95)
+        cortada = SimpleUploadedFile("cortada.jpg", buffer.getvalue()[: buffer.tell() // 2], content_type="image/jpeg")
+        self.entrar(self.ong)
+        resposta = self.client.post("/api/meus-animais/", self.dados_formulario(foto=cortada), format="multipart")
+        self.assertEqual(resposta.status_code, 400)
+        self.assertEqual(resposta.data["foto"], ["Não conseguimos abrir este arquivo como imagem. Tente outra foto."])
+
+    def test_lista_do_adotante_nao_consulta_por_animal(self):
+        for indice in range(6):
+            animal = self.criar_animal(nome=f"Animal {indice}")
+            if indice % 2:
+                animal.solicitacoes.create(adotante=self.ana)
+        self.entrar(self.ana)
+        with self.assertNumQueries(3):
+            resposta = self.client.get("/api/animais/")
+        pedidos = [a["minha_solicitacao"] for a in resposta.data["results"]]
+        self.assertEqual(sum(1 for p in pedidos if p), 3)

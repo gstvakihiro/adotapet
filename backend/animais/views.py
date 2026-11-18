@@ -1,10 +1,11 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.permissoes import EhResponsavel
+from solicitacoes.models import SolicitacaoAdocao
 
 from .models import FAIXAS_IDADE, Animal
 from .serializers import AnimalPublicoSerializer, AnimalResponsavelSerializer
@@ -12,6 +13,18 @@ from .serializers import AnimalPublicoSerializer, AnimalResponsavelSerializer
 
 def _valores(request, nome):
     return [valor for valor in request.query_params.get(nome, "").split(",") if valor]
+
+
+def com_minhas_solicitacoes(queryset, usuario):
+    if not usuario.is_authenticated or not usuario.is_adotante:
+        return queryset
+    return queryset.prefetch_related(
+        Prefetch(
+            "solicitacoes",
+            queryset=SolicitacaoAdocao.objects.filter(adotante=usuario),
+            to_attr="minhas_solicitacoes",
+        )
+    )
 
 
 def filtrar_por_idade(queryset, faixas):
@@ -44,13 +57,15 @@ class AnimalListaView(generics.ListAPIView):
             animais = animais.filter(cidade__iexact=cidade)
         if uf:
             animais = animais.filter(uf=uf)
-        return animais
+        return com_minhas_solicitacoes(animais, self.request.user)
 
 
 class AnimalDetalheView(generics.RetrieveAPIView):
     serializer_class = AnimalPublicoSerializer
     permission_classes = [AllowAny]
-    queryset = Animal.objects.select_related("responsavel")
+
+    def get_queryset(self):
+        return com_minhas_solicitacoes(Animal.objects.select_related("responsavel"), self.request.user)
 
 
 class CidadesView(APIView):
