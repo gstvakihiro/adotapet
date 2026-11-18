@@ -82,14 +82,12 @@ export default function DetalheAnimal() {
       setAnimal((atual) => ({ ...atual, minha_solicitacao: { id: solicitacao.id, status: solicitacao.status } }))
       setEnviado(true)
     } catch (erro) {
-      const mensagem = erro.mensagem('animal')
-      if (mensagem?.includes('adotado')) {
-        setAnimal((atual) => ({ ...atual, status: 'adotado' }))
-        setAvisoEnvio(mensagem)
-      } else if (mensagem) {
-        setAvisoEnvio(mensagem)
+      const atualizado = await api(`/api/animais/${id}/`).catch(() => null)
+      if (atualizado) setAnimal(atualizado)
+      if (atualizado?.minha_solicitacao) {
+        setEnviado(true)
       } else {
-        setAvisoEnvio('Não foi possível enviar. Confira sua conexão e tente de novo.')
+        setAvisoEnvio(erro.mensagem('animal') || 'Não foi possível enviar. Confira sua conexão e tente de novo.')
       }
     } finally {
       setEnviando(false)

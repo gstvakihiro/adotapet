@@ -1,8 +1,12 @@
 .detalhe {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 40px;
   align-items: start;
+}
+
+.detalhe > * {
+  min-width: 0;
 }
 
 .foto-grande {
@@ -88,11 +92,12 @@
 .interesse-info .botao-texto {
   color: var(--primaria);
   padding-left: 0;
+  text-align: left;
 }
 
 @media (max-width: 820px) {
   .detalhe {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
 

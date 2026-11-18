@@ -122,7 +122,8 @@ a {
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  white-space: nowrap;
+  text-align: center;
+  overflow-wrap: anywhere;
   transition: background-color 0.15s, color 0.15s, border-color 0.15s;
 }
 
@@ -562,12 +563,16 @@ a.cartao-animal:hover {
 }
 
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
 }
 
 @media (max-width: 720px) {
