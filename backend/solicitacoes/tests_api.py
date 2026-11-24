@@ -1,8 +1,11 @@
+from rest_framework.exceptions import ValidationError
+
 from animais.models import Animal
 from core.testes import ApiTestCase
 from usuarios.models import Usuario
 
 from .models import SolicitacaoAdocao
+from .serializers import MENSAGEM_ANIMAL_ADOTADO, SolicitacaoAdotanteSerializer
 
 
 class SolicitacaoApiTests(ApiTestCase):
@@ -85,3 +88,15 @@ class SolicitacaoApiTests(ApiTestCase):
         self.assertEqual(self.client.get("/api/auth/me/").data["pendentes"], 1)
         self.entrar(self.ana)
         self.assertEqual(self.client.get("/api/auth/me/").data["pendentes"], 0)
+
+    def test_pedido_confere_status_de_novo_ao_gravar(self):
+        self.entrar(self.ana)
+        serializer = SolicitacaoAdotanteSerializer(
+            data={"animal": str(self.rex.id)}, context={"request": type("R", (), {"user": self.ana})()}
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        Animal.objects.filter(pk=self.rex.pk).update(status=Animal.Status.ADOTADO)
+        with self.assertRaises(ValidationError) as erro:
+            serializer.save()
+        self.assertEqual(erro.exception.detail, {"animal": [MENSAGEM_ANIMAL_ADOTADO]})
+        self.assertFalse(SolicitacaoAdocao.objects.exists())

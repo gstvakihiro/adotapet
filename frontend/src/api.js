@@ -41,30 +41,47 @@ export class ErroApi extends Error {
   }
 }
 
-let renovacaoEmAndamento = null
+let renovacao = null
 
-function renovarToken() {
-  const tokens = lerTokens()
-  if (!tokens?.refresh) return Promise.resolve(false)
-  renovacaoEmAndamento ??= fetch('/api/auth/token/renovar/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh: tokens.refresh }),
-  })
-    .then(async (resposta) => {
-      if (!resposta.ok) return false
-      const dados = await resposta.json()
-      salvarTokens({ ...tokens, access: dados.access })
-      return true
+function renovarToken(tokens) {
+  if (renovacao?.refresh !== tokens.refresh) {
+    const promessa = fetch('/api/auth/token/renovar/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh: tokens.refresh }),
     })
-    .catch(() => false)
-    .finally(() => {
-      renovacaoEmAndamento = null
-    })
-  return renovacaoEmAndamento
+      .then(
+        async (resposta) => {
+          if (!resposta.ok) return null
+          const dados = await resposta.json()
+          if (lerTokens()?.refresh !== tokens.refresh) return null
+          const novos = { ...tokens, access: dados.access }
+          salvarTokens(novos)
+          return novos
+        },
+        () => {
+          throw new ErroApi(0, null)
+        },
+      )
+      .finally(() => {
+        if (renovacao?.promessa === promessa) renovacao = null
+      })
+    renovacao = { refresh: tokens.refresh, promessa }
+  }
+  return renovacao.promessa
 }
 
-export async function api(caminho, { metodo = 'GET', dados, autenticar = true } = {}, jaTentou = false) {
+async function enviar(caminho, metodo, corpo, cabecalhos, access, sinal) {
+  const headers = access ? { ...cabecalhos, Authorization: `Bearer ${access}` } : cabecalhos
+  try {
+    return await fetch(caminho, { method: metodo, headers, body: corpo, signal: sinal })
+  } catch (erro) {
+    if (sinal?.aborted) throw erro
+    throw new ErroApi(0, null)
+  }
+}
+
+export async function api(caminho, { metodo = 'GET', dados, autenticar = true, sinal } = {}) {
   const cabecalhos = {}
   let corpo
   if (dados instanceof FormData) corpo = dados
@@ -72,20 +89,20 @@ export async function api(caminho, { metodo = 'GET', dados, autenticar = true } 
     cabecalhos['Content-Type'] = 'application/json'
     corpo = JSON.stringify(dados)
   }
-  const tokens = lerTokens()
-  if (autenticar && tokens?.access) cabecalhos.Authorization = `Bearer ${tokens.access}`
+  const tokens = autenticar ? lerTokens() : null
 
-  let resposta
-  try {
-    resposta = await fetch(caminho, { method: metodo, headers: cabecalhos, body: corpo })
-  } catch {
-    throw new ErroApi(0, null)
-  }
+  let resposta = await enviar(caminho, metodo, corpo, cabecalhos, tokens?.access, sinal)
 
-  if (resposta.status === 401 && autenticar && tokens?.access && !jaTentou) {
-    if (await renovarToken()) return api(caminho, { metodo, dados, autenticar }, true)
-    salvarTokens(null)
-    return api(caminho, { metodo, dados, autenticar: false }, true)
+  if (resposta.status === 401 && tokens?.access) {
+    const novos = tokens.refresh ? await renovarToken(tokens) : null
+    if (novos) {
+      resposta = await enviar(caminho, metodo, corpo, cabecalhos, novos.access, sinal)
+    } else if (lerTokens()?.refresh === tokens.refresh) {
+      salvarTokens(null)
+      resposta = await enviar(caminho, metodo, corpo, cabecalhos, null, sinal)
+    } else {
+      throw new ErroApi(401, null)
+    }
   }
 
   const texto = await resposta.text()

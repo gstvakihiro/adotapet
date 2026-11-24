@@ -1,30 +1,39 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { aoEncerrarSessao, api, lerTokens, salvarTokens } from './api.js'
 
 const AuthContexto = createContext(null)
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(undefined)
+  const versaoDaSessao = useRef(0)
+
+  const encerrar = useCallback(() => {
+    versaoDaSessao.current += 1
+    setUsuario(null)
+  }, [])
 
   const recarregar = useCallback(async () => {
-    if (!lerTokens()?.access) {
+    const versao = ++versaoDaSessao.current
+    const origem = lerTokens()?.refresh
+    if (!origem) {
       setUsuario(null)
       return null
     }
+    let dados = null
     try {
-      const dados = await api('/api/auth/me/')
-      setUsuario(dados)
-      return dados
+      dados = await api('/api/auth/me/')
     } catch {
-      setUsuario(null)
-      return null
+      dados = null
     }
+    if (versao !== versaoDaSessao.current || lerTokens()?.refresh !== origem) return null
+    setUsuario(dados)
+    return dados
   }, [])
 
   useEffect(() => {
     recarregar()
-    return aoEncerrarSessao(() => setUsuario(null))
-  }, [recarregar])
+    return aoEncerrarSessao(encerrar)
+  }, [recarregar, encerrar])
 
   const entrar = useCallback(
     async (email, senha) => {
@@ -46,8 +55,8 @@ export function AuthProvider({ children }) {
 
   const sair = useCallback(() => {
     salvarTokens(null)
-    setUsuario(null)
-  }, [])
+    encerrar()
+  }, [encerrar])
 
   const valor = useMemo(
     () => ({ usuario, entrar, cadastrar, sair, recarregar }),

@@ -55,7 +55,15 @@ export function Login() {
       const usuario = await entrar(email, senha)
       navegar(destinoDepois(usuario, busca.get('proximo')), { replace: true })
     } catch (falha) {
-      setErro(falha.status === 401 ? 'Email ou senha incorretos.' : falha.status === 400 ? 'Preencha o email e a senha.' : 'Não foi possível entrar. Confira sua conexão e tente de novo.')
+      setErro(
+        falha.status === 401
+          ? 'Email ou senha incorretos.'
+          : falha.status === 400
+            ? 'Preencha o email e a senha.'
+            : falha.status === 429
+              ? falha.mensagem()
+              : 'Não foi possível entrar. Confira sua conexão e tente de novo.',
+      )
       setEnviando(false)
     }
   }
@@ -120,6 +128,8 @@ export function Cadastro() {
       if (falha.status === 400) {
         setErros(Object.fromEntries(['nome', 'email', 'telefone', 'senha', 'tipo'].map((c) => [c, falha.mensagem(c)])))
         setErroGeral('Confira os campos destacados.')
+      } else if (falha.status === 429) {
+        setErroGeral(falha.mensagem())
       } else {
         setErroGeral('Não foi possível criar a conta. Confira sua conexão e tente de novo.')
       }

@@ -3,11 +3,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from core.limites import ComLimiteDeTentativas
+
 from .serializers import CadastroSerializer, LoginSerializer, RenovarTokenSerializer, UsuarioSerializer
 from .tokens import gerar_tokens
 
 
-class CadastroView(generics.CreateAPIView):
+class CadastroView(ComLimiteDeTentativas, generics.CreateAPIView):
+    throttle_scope = "cadastro"
     serializer_class = CadastroSerializer
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -19,11 +22,13 @@ class CadastroView(generics.CreateAPIView):
         return Response({**serializer.data, **gerar_tokens(usuario)}, status=status.HTTP_201_CREATED)
 
 
-class LoginView(TokenObtainPairView):
+class LoginView(ComLimiteDeTentativas, TokenObtainPairView):
+    throttle_scope = "login"
     serializer_class = LoginSerializer
 
 
-class RenovarTokenView(TokenRefreshView):
+class RenovarTokenView(ComLimiteDeTentativas, TokenRefreshView):
+    throttle_scope = "renovar"
     serializer_class = RenovarTokenSerializer
 
 

@@ -5,6 +5,8 @@ from django.db import models
 
 from core.models import ModeloBase
 
+from .imagens import nome_da_foto
+
 EXTENSOES_FOTO = ["jpg", "jpeg", "png", "webp"]
 MENSAGEM_FORMATO_FOTO = "Este formato não é aceito. Envie a foto em JPG, PNG ou WebP."
 IDADE_MAXIMA = 30
@@ -77,7 +79,7 @@ class Animal(ModeloBase):
     status = models.CharField("status", max_length=10, choices=Status.choices, default=Status.DISPONIVEL)
     foto = models.ImageField(
         "foto",
-        upload_to="animais/",
+        upload_to=nome_da_foto,
         validators=[FileExtensionValidator(EXTENSOES_FOTO, message=MENSAGEM_FORMATO_FOTO)],
         help_text="Formatos aceitos: JPG, PNG ou WebP.",
     )

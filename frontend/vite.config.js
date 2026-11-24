@@ -13,8 +13,8 @@ export default defineConfig(({ mode }) => {
       allowedHosts: true,
       watch: { usePolling: true },
       proxy: {
-        '/api': { target: alvo },
-        '/media': { target: alvo },
+        '/api': { target: alvo, xfwd: true },
+        '/media': { target: alvo, xfwd: true },
       },
     },
   }

@@ -1,4 +1,5 @@
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Min, Prefetch, Q
+from django.db.models.functions import Lower
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -72,10 +73,14 @@ class CidadesView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        cidades = {}
-        for cidade, uf in Animal.objects.filter(status=Animal.Status.DISPONIVEL).values_list("cidade", "uf"):
-            cidades.setdefault((cidade.lower(), uf), {"cidade": cidade, "uf": uf})
-        return Response(sorted(cidades.values(), key=lambda item: (item["cidade"].lower(), item["uf"])))
+        cidades = (
+            Animal.objects.filter(status=Animal.Status.DISPONIVEL)
+            .annotate(chave=Lower("cidade"))
+            .values("chave", "uf")
+            .annotate(nome=Min("cidade"))
+            .order_by("chave", "uf")
+        )
+        return Response([{"cidade": item["nome"], "uf": item["uf"]} for item in cidades])
 
 
 class MeusAnimaisMixin:

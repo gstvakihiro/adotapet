@@ -9,6 +9,8 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -22,11 +24,19 @@ def env_list(name, default=""):
 
 # --- Segurança -------------------------------------------------------------
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-inseguro-troque-no-arquivo-env")
+CHAVE_DE_DESENVOLVIMENTO = "dev-inseguro-troque-no-arquivo-env"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", CHAVE_DE_DESENVOLVIMENTO)
 DEBUG = env_bool("DJANGO_DEBUG", True)
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0")
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
+else:
+    if SECRET_KEY == CHAVE_DE_DESENVOLVIMENTO or len(SECRET_KEY) < 50:
+        raise ImproperlyConfigured("Com DJANGO_DEBUG=False, defina DJANGO_SECRET_KEY com 50 caracteres ou mais.")
+    if not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS:
+        raise ImproperlyConfigured("Com DJANGO_DEBUG=False, liste os endereços do site em DJANGO_ALLOWED_HOSTS.")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # --- Aplicações ------------------------------------------------------------
@@ -149,6 +159,8 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 12,
+    "DEFAULT_THROTTLE_RATES": {"login": "20/min", "cadastro": "30/hour", "renovar": "60/min"},
+    "NUM_PROXIES": 1,
 }
 
 SIMPLE_JWT = {

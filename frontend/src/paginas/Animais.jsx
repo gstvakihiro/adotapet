@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { api } from '../api.js'
 import { Aviso, CartaoAnimal, Carregando } from '../componentes/Comuns.jsx'
@@ -90,18 +90,28 @@ export default function Animais() {
     [busca],
   )
 
+  const buscaAtual = useRef(null)
+
   const carregar = useCallback(() => {
+    buscaAtual.current?.abort()
+    const busca = new AbortController()
+    buscaAtual.current = busca
     setEstado('carregando')
-    api(`/api/animais/?${consulta}`)
+    setCarregandoMais(false)
+    api(`/api/animais/?${consulta}`, { sinal: busca.signal })
       .then((dados) => {
+        if (busca.signal.aborted) return
         setPagina(dados)
         setEstado('pronto')
       })
-      .catch(() => setEstado('erro'))
+      .catch(() => {
+        if (!busca.signal.aborted) setEstado('erro')
+      })
   }, [consulta])
 
   useEffect(() => {
     carregar()
+    return () => buscaAtual.current?.abort()
   }, [carregar])
 
   useEffect(() => {
@@ -120,15 +130,18 @@ export default function Animais() {
   const limpar = () => setBusca(new URLSearchParams(), { replace: true })
 
   const carregarMais = async () => {
+    const busca = buscaAtual.current
+    if (!busca || !pagina.next || carregandoMais) return
     setCarregandoMais(true)
     try {
       const caminho = new URL(pagina.next, window.location.origin)
-      const dados = await api(caminho.pathname + caminho.search)
+      const dados = await api(caminho.pathname + caminho.search, { sinal: busca.signal })
+      if (busca.signal.aborted) return
       setPagina((atual) => ({ ...dados, results: [...atual.results, ...dados.results] }))
     } catch {
-      setEstado('erro')
+      if (!busca.signal.aborted) setEstado('erro')
     } finally {
-      setCarregandoMais(false)
+      if (!busca.signal.aborted) setCarregandoMais(false)
     }
   }
 

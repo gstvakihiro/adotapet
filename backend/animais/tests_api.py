@@ -7,6 +7,7 @@ from core.testes import ApiTestCase, imagem
 from usuarios.models import Usuario
 
 from .models import Animal
+from .serializers import AnimalResponsavelSerializer
 
 
 class AnimalApiTests(ApiTestCase):
@@ -152,3 +153,52 @@ class AnimalApiTests(ApiTestCase):
             resposta = self.client.get("/api/animais/")
         pedidos = [a["minha_solicitacao"] for a in resposta.data["results"]]
         self.assertEqual(sum(1 for p in pedidos if p), 3)
+
+    def test_trocar_foto_remove_a_anterior_e_gera_nome_unico(self):
+        self.entrar(self.ong)
+        criado = self.client.post("/api/meus-animais/", self.dados_formulario(foto=imagem("rex.jpg")), format="multipart")
+        animal = Animal.objects.get(id=criado.data["id"])
+        anterior = animal.foto.name
+        self.assertRegex(anterior, r"^animais/[0-9a-f]{32}\.jpg$")
+        with self.captureOnCommitCallbacks(execute=True):
+            resposta = self.client.patch(
+                f"/api/meus-animais/{animal.id}/", {"foto": imagem("rex.jpg")}, format="multipart"
+            )
+        self.assertEqual(resposta.status_code, 200, resposta.data)
+        animal.refresh_from_db()
+        self.assertNotEqual(animal.foto.name, anterior)
+        self.assertTrue(animal.foto.storage.exists(animal.foto.name))
+        self.assertFalse(animal.foto.storage.exists(anterior))
+
+    def test_edicao_grava_so_os_campos_enviados(self):
+        animal = self.criar_animal()
+        copia_antiga = Animal.objects.get(pk=animal.pk)
+        Animal.objects.filter(pk=animal.pk).update(status=Animal.Status.ADOTADO)
+        serializer = AnimalResponsavelSerializer(copia_antiga, data={"descricao": "Brincalhão."}, partial=True)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+        animal.refresh_from_db()
+        self.assertEqual((animal.status, animal.descricao), ("adotado", "Brincalhão."))
+
+    def test_foto_com_pixels_demais_ou_formato_disfarcado_volta_400(self):
+        self.entrar(self.ong)
+        url = "/api/meus-animais/"
+        buffer = BytesIO()
+        Image.new("L", (8000, 7000)).save(buffer, "PNG")
+        enorme = SimpleUploadedFile("enorme.png", buffer.getvalue(), content_type="image/png")
+        resposta = self.client.post(url, self.dados_formulario(foto=enorme), format="multipart")
+        self.assertEqual(resposta.data["foto"], ["A foto tem resolução alta demais. Escolha uma foto menor."])
+        disfarcada = imagem("gif.jpg", "GIF")
+        resposta = self.client.post(url, self.dados_formulario(foto=disfarcada), format="multipart")
+        self.assertEqual(resposta.data["foto"], ["Este formato não é aceito. Envie a foto em JPG, PNG ou WebP."])
+
+    def test_cidades_agrupadas_no_banco(self):
+        for cidade in ("Votuporanga", "votuporanga", "Votuporanga", "Fernandópolis"):
+            self.criar_animal(cidade=cidade)
+        self.criar_animal(cidade="Votuporanga", uf="MG")
+        with self.assertNumQueries(1):
+            resposta = self.client.get("/api/animais/cidades/")
+        self.assertEqual(
+            resposta.data,
+            [{"cidade": "Fernandópolis", "uf": "SP"}, {"cidade": "Votuporanga", "uf": "MG"}, {"cidade": "Votuporanga", "uf": "SP"}],
+        )

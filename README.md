@@ -272,6 +272,10 @@ Para recomeçar do zero: `docker compose exec backend python manage.py popular_d
 No celular, o campo de foto do cadastro de animal abre a câmera ou a galeria.
 
 > ⚠️ **Só para desenvolvimento e demonstração.** Com `DJANGO_DEBUG=True` (o padrão do `.env.example`), o backend aceita qualquer endereço e qualquer origem (`ALLOWED_HOSTS = ["*"]` e `CORS_ALLOW_ALL_ORIGINS`), e o Vite aceita qualquer host. É isso que deixa o celular abrir pela rede local. Para publicar na internet, use `DJANGO_DEBUG=False`, uma `DJANGO_SECRET_KEY` própria e preencha `DJANGO_ALLOWED_HOSTS` e `CORS_ALLOWED_ORIGINS` com o endereço real.
+>
+> Com `DJANGO_DEBUG=False`, o backend **não sobe** se a `DJANGO_SECRET_KEY` tiver menos de 50 caracteres ou se `DJANGO_ALLOWED_HOSTS` estiver vazio ou com `*`. Publicar ainda exige servidor de aplicação, HTTPS e um serviço para as fotos, porque o `runserver` e o Vite do Compose são de desenvolvimento.
+
+> ⏱️ **Limite de tentativas.** Login aceita 20 tentativas por minuto, cadastro 30 por hora e renovação de sessão 60 por minuto, por endereço. Os valores ficam em `DEFAULT_THROTTLE_RATES`, no `settings.py`. Se muitos celulares aparecerem com o mesmo endereço (pode acontecer com o Docker Desktop no Windows) e o limite atrapalhar a demonstração, aumente os números ali.
 
 <a id="como-contribuir"></a>
 

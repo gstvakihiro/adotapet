@@ -49,7 +49,10 @@ class SolicitacaoAdotanteSerializer(serializers.ModelSerializer):
     def create(self, dados):
         try:
             with transaction.atomic():
-                return SolicitacaoAdocao.objects.create(adotante=self.context["request"].user, **dados)
+                animal = Animal.objects.select_for_update().get(pk=dados["animal"].pk)
+                if not animal.esta_disponivel:
+                    raise serializers.ValidationError({"animal": [MENSAGEM_ANIMAL_ADOTADO]})
+                return SolicitacaoAdocao.objects.create(adotante=self.context["request"].user, animal=animal)
         except IntegrityError:
             raise serializers.ValidationError({"animal": [MENSAGEM_SOLICITACAO_REPETIDA]})
 

@@ -1,7 +1,11 @@
-from django.db import connection
+import logging
+
+from django.db import DatabaseError, connection
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
@@ -11,11 +15,7 @@ def health(request):
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
-        banco = "ok"
-    except Exception:  # noqa: BLE001 - qualquer falha de conexão conta como erro
-        banco = "erro"
-
-    return Response(
-        {"status": "ok", "banco": banco, "motor": connection.vendor},
-        status=200 if banco == "ok" else 503,
-    )
+    except DatabaseError:
+        logger.exception("Banco indisponível na verificação de saúde")
+        return Response({"status": "erro", "banco": "erro"}, status=503)
+    return Response({"status": "ok", "banco": "ok", "motor": connection.vendor})

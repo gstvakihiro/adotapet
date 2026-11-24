@@ -1,8 +1,15 @@
+from django.db import transaction
 from PIL import Image
 from rest_framework import serializers
 
-from .imagens import TAMANHO_MAXIMO_BYTES, preparar_foto
-from .models import IDADE_MAXIMA, Animal
+from .imagens import (
+    TAMANHO_MAXIMO_BYTES,
+    FormatoNaoAceito,
+    ResolucaoAltaDemais,
+    preparar_foto,
+    remover_foto_sem_uso,
+)
+from .models import IDADE_MAXIMA, MENSAGEM_FORMATO_FOTO, Animal
 
 MENSAGEM_IDADE = f"Informe a idade em anos, só com números, até {IDADE_MAXIMA}. Use 0 para menos de 1 ano."
 
@@ -78,5 +85,23 @@ class AnimalResponsavelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A foto passa de 12 MB. Escolha uma foto menor.")
         try:
             return preparar_foto(foto)
-        except (OSError, Image.DecompressionBombError):
+        except FormatoNaoAceito:
+            raise serializers.ValidationError(MENSAGEM_FORMATO_FOTO)
+        except (ResolucaoAltaDemais, Image.DecompressionBombError):
+            raise serializers.ValidationError("A foto tem resolução alta demais. Escolha uma foto menor.")
+        except OSError:
             raise serializers.ValidationError("Não conseguimos abrir este arquivo como imagem. Tente outra foto.")
+
+    def update(self, animal, dados):
+        if not dados:
+            return animal
+        foto_anterior = animal.foto.name if "foto" in dados else None
+        with transaction.atomic():
+            for campo, valor in dados.items():
+                setattr(animal, campo, valor)
+            animal.save(update_fields=[*dados, "atualizado_em"])
+            if foto_anterior and foto_anterior != animal.foto.name:
+                storage = animal.foto.storage
+                transaction.on_commit(lambda: remover_foto_sem_uso(storage, foto_anterior))
+        animal.refresh_from_db()
+        return animal
