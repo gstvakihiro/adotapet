@@ -84,7 +84,18 @@ class RenovarTokenSerializer(TokenRefreshSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     """Dados públicos do usuário logado, usados no /me."""
 
+    pendentes = serializers.SerializerMethodField()
+
     class Meta:
         model = Usuario
-        fields = ("id", "email", "nome", "telefone", "tipo")
-        read_only_fields = ("id", "email", "tipo")
+        fields = ("id", "email", "nome", "telefone", "tipo", "pendentes")
+        read_only_fields = ("id", "email", "tipo", "pendentes")
+        extra_kwargs = {"nome": {"error_messages": {"blank": "Informe o seu nome."}}}
+
+    def get_pendentes(self, usuario):
+        if not usuario.is_responsavel:
+            return 0
+        return usuario.animais.filter(solicitacoes__status="pendente").values("solicitacoes").count()
+
+    def validate_nome(self, nome):
+        return " ".join(nome.split())

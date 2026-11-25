@@ -14,7 +14,7 @@ class AnimalTests(TestCase):
 
     def criar(self, **extra):
         dados = dict(
-            nome="Rex", cidade="Votuporanga", especie=Animal.Especie.CACHORRO, sexo=Animal.Sexo.MACHO,
+            nome="Rex", cidade="Votuporanga", uf="SP", especie=Animal.Especie.CACHORRO, sexo=Animal.Sexo.MACHO,
             idade=0, porte=Animal.Porte.MEDIO, foto="animais/rex.jpg", responsavel=self.responsavel,
         )
         dados.update(extra)

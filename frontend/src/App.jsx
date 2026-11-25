@@ -1,51 +1,49 @@
-import { useEffect, useState } from 'react'
-import { API_URL, getHealth } from './api.js'
+import { Link, Route, Routes } from 'react-router'
+import Cabecalho from './componentes/Cabecalho.jsx'
+import { Protegida } from './componentes/Comuns.jsx'
+import { Cadastro, Login } from './paginas/Acesso.jsx'
+import Animais from './paginas/Animais.jsx'
+import DetalheAnimal from './paginas/DetalheAnimal.jsx'
+import FormAnimal from './paginas/FormAnimal.jsx'
+import Inicio from './paginas/Inicio.jsx'
+import Interessados from './paginas/Interessados.jsx'
+import MeusAnimais from './paginas/MeusAnimais.jsx'
+import MinhasSolicitacoes from './paginas/MinhasSolicitacoes.jsx'
+import Perfil from './paginas/Perfil.jsx'
 
-// Tela provisória da Fase 0: só confirma que frontend, API e banco
-// estão conversando. Será substituída pelas telas reais na Fase 5.
-export default function App() {
-  const [estado, setEstado] = useState({ carregando: true })
-
-  useEffect(() => {
-    getHealth()
-      .then((dados) => setEstado({ dados }))
-      .catch((erro) => setEstado({ erro: erro.message }))
-  }, [])
-
-  const apiOk = Boolean(estado.dados)
-  const bancoOk = estado.dados?.banco === 'ok'
-
+function NaoEncontrada() {
   return (
-    <main className="pagina">
-      <h1>AdotaPet</h1>
-      <p className="subtitulo">Ambiente de desenvolvimento · Fase 0</p>
-
-      <ul className="servicos" aria-live="polite">
-        <Servico nome="Frontend (React)" ok detalhe="rodando nesta página" />
-        <Servico
-          nome="API (Django)"
-          ok={apiOk}
-          carregando={estado.carregando}
-          detalhe={estado.erro ?? API_URL}
-        />
-        <Servico
-          nome="Banco de dados"
-          ok={bancoOk}
-          carregando={estado.carregando}
-          detalhe={estado.dados?.motor ?? 'sem resposta da API'}
-        />
-      </ul>
+    <main className="conteudo">
+      <div className="cartao vazio">
+        <h2>Página não encontrada</h2>
+        <p>O endereço pode estar errado.</p>
+        <Link to="/" className="botao botao-primario">Ir para o início</Link>
+      </div>
     </main>
   )
 }
 
-function Servico({ nome, ok, carregando, detalhe }) {
-  const status = carregando ? 'verificando…' : ok ? 'ok' : 'erro'
+export default function App() {
   return (
-    <li className={`servico ${carregando ? '' : ok ? 'ok' : 'erro'}`}>
-      <span className="nome">{nome}</span>
-      <span className="status">{status}</span>
-      <span className="detalhe">{detalhe}</span>
-    </li>
+    <>
+      <a href="#principal" className="pular">Pular para o conteúdo</a>
+      <Cabecalho />
+      <div id="principal">
+        <Routes>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/entrar" element={<Login />} />
+          <Route path="/criar-conta" element={<Cadastro />} />
+          <Route path="/animais" element={<Animais />} />
+          <Route path="/animais/:id" element={<DetalheAnimal />} />
+          <Route path="/minhas-solicitacoes" element={<Protegida tipo="adotante"><MinhasSolicitacoes /></Protegida>} />
+          <Route path="/meus-animais" element={<Protegida tipo="responsavel"><MeusAnimais /></Protegida>} />
+          <Route path="/meus-animais/novo" element={<Protegida tipo="responsavel"><FormAnimal /></Protegida>} />
+          <Route path="/meus-animais/:id/editar" element={<Protegida tipo="responsavel"><FormAnimal /></Protegida>} />
+          <Route path="/meus-animais/:id/interessados" element={<Protegida tipo="responsavel"><Interessados /></Protegida>} />
+          <Route path="/perfil" element={<Protegida><Perfil /></Protegida>} />
+          <Route path="*" element={<NaoEncontrada />} />
+        </Routes>
+      </div>
+    </>
   )
 }

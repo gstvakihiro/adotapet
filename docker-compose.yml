@@ -34,6 +34,8 @@ services:
   frontend:
     build: ./frontend
     env_file: .env
+    environment:
+      API_PROXY_ALVO: http://backend:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules # mantém o node_modules do container, não o da sua máquina

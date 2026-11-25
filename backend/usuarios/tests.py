@@ -27,6 +27,7 @@ class MeTests(APITestCase):
                 "nome": "Ana",
                 "telefone": "(17) 99999-0000",
                 "tipo": "adotante",
+                "pendentes": 0,
             },
         )
 
@@ -71,6 +72,6 @@ class MeTests(APITestCase):
         self.usuario.save()
         self.assertEqual(self.client.get(self.url, **cabecalho).status_code, 401)
 
-    def test_por_enquanto_so_aceita_get(self):
-        resposta = self.client.patch(self.url, {"nome": "Outra"}, **cabecalho_com_token(self.usuario))
+    def test_aceita_get_e_patch_mas_nao_put(self):
+        resposta = self.client.put(self.url, {"nome": "Outra"}, **cabecalho_com_token(self.usuario))
         self.assertEqual(resposta.status_code, 405)

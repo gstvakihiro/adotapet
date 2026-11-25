@@ -1,0 +1,108 @@
+.interessados {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.resumo-animal {
+  overflow: hidden;
+  position: sticky;
+  top: 94px;
+}
+
+.resumo-corpo {
+  display: grid;
+  gap: 4px;
+  padding: 16px 20px 20px;
+  justify-items: start;
+  min-width: 0;
+}
+
+.resumo-corpo > * {
+  max-width: 100%;
+}
+
+.resumo-corpo .alternar,
+.resumo-corpo .botao {
+  width: 100%;
+}
+
+.resumo-status {
+  margin-top: 12px;
+}
+
+.resumo-corpo .ajuda {
+  margin-bottom: 8px;
+}
+
+.lista-interessados {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.interessado {
+  padding: 16px 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.interessado-linha {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.interessado-nome {
+  flex: 1;
+  min-width: 0;
+}
+
+.interessado-acoes {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+@media (max-width: 900px) {
+  .interessados {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-animal {
+    position: static;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+  }
+
+  .resumo-animal .foto-animal {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .resumo-animal {
+    grid-template-columns: 1fr;
+  }
+
+  .resumo-animal .foto-animal {
+    aspect-ratio: 16 / 9;
+  }
+
+  .interessado-linha {
+    flex-wrap: wrap;
+  }
+
+  .interessado-acoes {
+    width: 100%;
+  }
+
+  .interessado-acoes .botao {
+    flex: 1;
+  }
+}
